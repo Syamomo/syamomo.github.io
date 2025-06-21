@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生後日数カウンター Pro</title>
+    <style>
+        /* ======== 基本スタイル（変更なし）======== */
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --bg-color: #f8f9fa;
+            --text-color: #333;
+            --card-bg: #fff;
+            --gold-color: #ffd700;
+            --diamond-color: #b9f2ff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        /* ======== ★有名人記念日エリア（ここから追加）======== */
+        .celebrity-anniversary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            text-align: center;
+            display: none; /* JavaScriptで表示を制御 */
+        }
+        .celebrity-anniversary h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+            border-bottom: 1px solid rgba(255,255,255,0.5);
+            padding-bottom: 5px;
+        }
+        .celebrity-anniversary ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        /* ======== ★有名人記念日エリア（ここまで追加）======== */
+
+        /* ======== 入力エリア（変更なし）======== */
+        .input-area {
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .input-area p {
+            margin-top: 0;
+            font-weight: bold;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .input-group label {
+            white-space: nowrap;
+        }
+        .input-group select, .input-group input[type="date"] {
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .input-group select {
+            flex-grow: 1;
+        }
+        .calc-button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .calc-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* ======== 結果表示エリア（変更なし）======== */
+        #result-area {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            display: none; /* 最初は非表示 */
+        }
+        #result-text {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+        #anniversary-message {
+            margin: 10px 0 0 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .anniversary-1000 {
+            background-color: var(--gold-color);
+            color: #4c3d00;
+            animation: pulse 1.5s infinite;
+        }
+        .anniversary-10000 {
+            background: linear-gradient(45deg, var(--diamond-color), #e0c3fc);
+            color: #3d2259;
+            animation: sparkle 1s infinite alternate;
+        }
+        
+        /* ======== 次の記念日＆SNS共有エリア（変更なし）======== */
+        #next-anniversary, #share-area {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            text-align: center;
+            display: none; /* 最初は非表示 */
+        }
+        .share-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 10px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #1DA1F2; /* Twitterのブランドカラー */
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+        .share-button:hover {
+            opacity: 0.8;
+        }
+        
+        /* ======== アニメーション（変更なし）======== */
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); }
+            70% { transform: scale(1.02); box-shadow: 0 0 10px 20px rgba(255, 215, 0, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+        }
+        @keyframes sparkle {
+            from { text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #b9f2ff; }
+            to { text-shadow: 0 0 15px #fff, 0 0 25px #b9f2ff, 0 0 35px #e0c3fc; }
+        }
+    </style>
+</head>
+<body onload="init()">
+
+    <div class="container">
+        
+        <div id="celebrity-anniversary-area" class="celebrity-anniversary">
+            <h2>🎉祝・生誕10000日！🎉</h2>
+            <ul id="celebrity-list">
+                </ul>
+        </div>
+        
+        <h1>生後日数カウンター Pro</h1>
+
+        <div class="input-area">
+            <p>1. カレンダーから入力</p>
+            <input type="date" id="birthday-calendar" class="input-group">
+        </div>
+        
+        <div class="input-area">
+            <p>2. プルダウンで入力</p>
+            <div class="input-group">
+                <select id="year"></select><label>年</label>
+                <select id="month"></select><label>月</label>
+                <select id="day"></select><label>日</label>
+            </div>
+        </div>
+
+        <button class="calc-button" onclick="calculate()">計算する</button>
+
+        <div id="result-area">
+            <p id="result-text"></p>
+            <p id="anniversary-message"></p>
+        </div>
+
+        <div id="next-anniversary"></div>
+
+        <div id="share-area">
+            <p>この結果を共有しよう！</p>
+            <a id="share-button" class="share-button" href="#" target="_blank" rel="noopener noreferrer">Xでポストする</a>
+        </div>
+    </div>
+
+<script>
+    // ======== ★有名人の生年月日リスト（ここから追加）========
+    // このリストを編集すると、チェックする有名人を変更できます。
+    // 形式: { name: '名前', birthday: 'YYYY-MM-DD' }
+    const celebrityMasterList = [
+        { name: '葵わかな', birthday: '1998-06-30' },
+        { name: '中川大志', birthday: '1998-06-14' },
+        { name: '広瀬すず', birthday: '1998-06-19' },
+        { name: '齋藤飛鳥', birthday: '1998-08-10' },
+        { name: '宮脇咲良 (LE SSERAFIM)', birthday: '1998-03-19' },
+        { name: 'TWICE ジヒョ', birthday: '1997-02-01' },
+        { name: 'SEVENTEEN ミンギュ', birthday: '1997-04-06' },
+        { name: 'BTS ジョングク', birthday: '1997-09-01' },
+        { name: '平野紫耀 (Number_i)', birthday: '1997-01-29' },
+        { name: '橋本環奈', birthday: '1999-02-03' },
+        { name: 'NCT マーク', birthday: '1999-08-02' }
+    ];
+
+    // ======== ★記念日をチェックする関数（ここから追加）========
+    function checkCelebrityAnniversary() {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const anniversaryCelebrities = [];
+
+        celebrityMasterList.forEach(celebrity => {
+            const birthday = new Date(celebrity.birthday);
+            birthday.setHours(0, 0, 0, 0);
+
+            const diffTime = today.getTime() - birthday.getTime();
+            // 生まれた日を1日目とする
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            
+            // 生誕10000日目の有名人を探す
+            if (diffDays === 10000) {
+                anniversaryCelebrities.push(celebrity.name);
+            }
+        });
+
+        // 該当者がいれば表示する
+        if (anniversaryCelebrities.length > 0) {
+            const area = document.getElementById('celebrity-anniversary-area');
+            const list = document.getElementById('celebrity-list');
+            list.innerHTML = ''; // リストを初期化
+
+            anniversaryCelebrities.forEach(name => {
+                const li = document.createElement('li');
+                li.textContent = `・${name} さん`;
+                list.appendChild(li);
+            });
+            
+            area.style.display = 'block';
+        }
+    }
+
+
+    // ======== 初期化処理 ========
+    function init() {
+        // ★ページ読み込み時に有名人記念日をチェックする
+        checkCelebrityAnniversary();
+
+        // （これより下は変更なし）
+        const yearSelect = document.getElementById('year');
+        const monthSelect = document.getElementById('month');
+        const daySelect = document.getElementById('day');
+        
+        const currentYear = new Date().getFullYear();
+
+        // 年のプルダウンを生成 (過去100年分)
+        for (let i = currentYear; i >= currentYear - 100; i--) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            yearSelect.appendChild(option);
+        }
+
+        // 月のプルダウンを生成
+        for (let i = 1; i <= 12; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            monthSelect.appendChild(option);
+        }
+
+        // 日のプルダウンを生成 (初期値として31日まで)
+        for (let i = 1; i <= 31; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            daySelect.appendChild(option);
+        }
+    }
+
+    // ======== 計算処理（変更なし）========
+    function calculate() {
+        let birthday;
+        const calendarInput = document.getElementById('birthday-calendar').value;
+        
+        if (calendarInput) {
+            birthday = new Date(calendarInput);
+        } else {
+            const year = document.getElementById('year').value;
+            const month = document.getElementById('month').value;
+            const day = document.getElementById('day').value;
+            birthday = new Date(year, month - 1, day);
+        }
+
+        if (isNaN(birthday.getTime())) {
+            alert('有効な生年月日を入力してください。');
+            return;
+        }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        birthday.setHours(0, 0, 0, 0);
+        
+        const diffTime = today.getTime() - birthday.getTime();
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        const resultDays = diffDays + 1;
+
+        const resultArea = document.getElementById('result-area');
+        const resultText = document.getElementById('result-text');
+        const anniversaryMessage = document.getElementById('anniversary-message');
+
+        resultText.textContent = `あなたは今日で生後 ${resultDays.toLocaleString()} 日目です！`;
+        
+        resultArea.className = '';
+        anniversaryMessage.textContent = '';
+
+        if (resultDays > 0 && resultDays % 10000 === 0) {
+            resultArea.classList.add('anniversary-10000');
+            anniversaryMessage.textContent = `🎉💎 超・特別記念日 💎🎉`;
+        } else if (resultDays > 0 && resultDays % 1000 === 0) {
+            resultArea.classList.add('anniversary-1000');
+            anniversaryMessage.textContent = `✨🎊 特別記念日 🎊✨`;
+        }
+        
+        resultArea.style.display = 'block';
+
+        const nextAnniversaryDiv = document.getElementById('next-anniversary');
+        let nextThousand;
+        if (resultDays % 1000 === 0) {
+            nextThousand = resultDays + 1000;
+        } else {
+            nextThousand = Math.ceil(resultDays / 1000) * 1000;
+        }
+        
+        const daysUntilNext = nextThousand - resultDays;
+
+        const nextAnniversaryDate = new Date();
+        nextAnniversaryDate.setDate(today.getDate() + daysUntilNext);
+
+        const y = nextAnniversaryDate.getFullYear();
+        const m = nextAnniversaryDate.getMonth() + 1;
+        const d = nextAnniversaryDate.getDate();
+
+        nextAnniversaryDiv.innerHTML = `次の <strong>${nextThousand.toLocaleString()}日記念日</strong> は...<br>
+            <strong>${y}年${m}月${d}日</strong> (あと${daysUntilNext}日)`;
+        nextAnniversaryDiv.style.display = 'block';
+
+        const shareArea = document.getElementById('share-area');
+        const shareButton = document.getElementById('share-button');
+        
+        let shareText = `私は今日で生まれてから${resultDays.toLocaleString()}日目でした！`;
+        if (anniversaryMessage.textContent) {
+            shareText += ` なんと今日は${anniversaryMessage.textContent.trim()}です！`;
+        }
+        shareText += `\n\nあなたも計算してみよう！`;
+        
+        const hashtags = "生後日数カウンター,記念日";
+        const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&hashtags=${encodeURIComponent(hashtags)}`;
+        
+        shareButton.href = tweetUrl;
+        shareArea.style.display = 'block';
+    }
+
+</script>
+
+</body>
+</html>
